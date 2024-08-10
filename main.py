@@ -2,8 +2,6 @@ import pygame
 
 import random
 
-import time
-
 import aux
 
 from buttons import Buttons
@@ -45,7 +43,7 @@ tela = 1 # 1 = inicio, #2 = escolher personagem #3 = jogo #4 = game over
 njogadores = 0
 njogadores_selecionados = 0
 posicao_seta = 0
-venceu = 1
+venceu = 0
 
 #carregar seta
 seta = pygame.image.load("imagens/seta.png")
@@ -73,18 +71,18 @@ while executando:
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
                 executando = False
-            if evento.type == pygame.KEYDOWN:
+            elif evento.type == pygame.KEYDOWN:
                 if evento.key == pygame.K_RIGHT:
                     posicao_seta+=1
                     if(posicao_seta > 1):
                         posicao_seta = 0
                     seta =pygame.transform.flip(seta, True, False)
-                if evento.key == pygame.K_LEFT:
+                elif evento.key == pygame.K_LEFT:
                     posicao_seta-=1
                     if posicao_seta < 0:
                         posicao_seta = 1
                     seta =pygame.transform.flip(seta, True, False)
-                if evento.key == pygame.K_RETURN:
+                elif evento.key == pygame.K_RETURN:
                     tela = 2
                     if(posicao_seta == 0):
                         njogadores = 1
@@ -119,26 +117,26 @@ while executando:
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
                 executando = False
-            if evento.type == pygame.KEYDOWN:
+            elif evento.type == pygame.KEYDOWN:
                 if evento.key == pygame.K_RIGHT:
                     posicao_seta+=1
                     if(posicao_seta > 3):
                         posicao_seta = 0
-                if evento.key == pygame.K_LEFT:
+                elif evento.key == pygame.K_LEFT:
                     posicao_seta-=1
                     if posicao_seta < 0:
                         posicao_seta = 3
-                if evento.key == pygame.K_RETURN:
+                elif evento.key == pygame.K_RETURN:
                     njogadores_selecionados+=1
                     if(njogadores == njogadores_selecionados):
                         tela = 3
 
+    #porradaria
     elif tela == 3:
         janela.blit(img_mapa, (0,0))
-        pygame.display.flip()
-        time.sleep(2)
         tela = 4
     
+    #game over ou play again
     elif tela == 4:
         if venceu == 1:
             img_fim = pygame.image.load("imagens/Venceu.png")
@@ -148,7 +146,7 @@ while executando:
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
                 executando = False
-            if evento.type == pygame.KEYDOWN:
+            elif evento.type == pygame.KEYDOWN:
                 if evento.key == pygame.K_RETURN:
                     posicao_seta = 0
                     njogadores = 0
