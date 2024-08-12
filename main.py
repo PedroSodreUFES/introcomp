@@ -1,9 +1,6 @@
 import pygame
-
 import random
-
 import aux
-
 from buttons import Buttons
 
 pygame.init()
@@ -155,7 +152,7 @@ while executando:
                     fonte = pygame.font.Font("freesansbold.ttf", 36)
                     text = fonte.render("Escolha o numero de jogadores", True, (255,255,255))
                 else:
-                    executando = False    
+                    executando = False
 
     pygame.display.flip()
 
