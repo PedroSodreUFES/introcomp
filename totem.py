@@ -5,7 +5,8 @@ class Totem(pygame.sprite.Sprite):
         super().__init__()
         self.x = 580
         self.y = 320
-        self.vida = 100
+        self.vida = 120
+        self.vidaTotal = 120
         self.rect= pygame.Rect(self.x, self.y, 100, 100)
     def desenhaTotem(self, janela, cor):
         pygame.draw.rect(janela, cor, self.rect)

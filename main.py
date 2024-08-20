@@ -16,6 +16,8 @@ import time
 
 import personagem
 
+import enemy
+
 pygame.init()
 
 #settings janela 
@@ -68,6 +70,11 @@ op1 = ""
 jogador2 = ""
 op2 = ""
 
+#pode usar golpe?
+g1 = pygame.Rect(120, 30, 30, 30)
+g2 = pygame.Rect(180, 30, 30, 30)
+g3 = pygame.Rect(240, 30, 30, 30)
+g4 = pygame.Rect(300, 30, 30, 30)
 #inimigos
 inimigos = []
 
@@ -78,7 +85,7 @@ tiros = []
 toten = totem.Totem()
 
 #teste movimento
-rect = pygame.Rect(100, 100, 30, 30)
+rect = pygame.Rect(300, 200, 30, 30)
 x = 100
 y = 100
 v = 0
@@ -93,7 +100,8 @@ areas = [area1, area2]
 
 #tempo
 inicio = ""
-
+zumbi_time = time.time()
+zumbis = []
 
 while executando:
     #tela de escolher numero de jogadores
@@ -188,8 +196,10 @@ while executando:
                     njogadores_selecionados+=1
                     if(njogadores == njogadores_selecionados):
                         tela = 3
+                        fonte = pygame.font.Font("freesansbold.ttf", 28)
                         #tempo
                         inicio = time.time()
+                        zumbi_time = time.time()
                 elif evento.key == pygame.K_q:
                     janela.blit(historinha, (0,0))
                     text = fonte.render("Pressione Q para sair", True, (255,255,255))
@@ -211,31 +221,90 @@ while executando:
     ##########################################################
 
         
-    #porradaria
+    #Luta
     elif tela == 3:
+        if time.time() - zumbi_time > 5 and len(zumbis) <= 10:
+            zumbi_time = time.time()
+            zumbis.append(enemy.Inimigo()) 
+
         # se passar de 3 minutos o jogador perde
         if time.time() - inicio > 180:
             tela = 4
+            continue
+        # se o personagem morrer
+        if jogador1.vida <= 0:
+            tela = 4
+            continue
         
         #se o totem morrer, o jogo acaba
-        #if toten.vida == 0:
-           #venceu = 1
-            #tela = 4
+        if toten.vida == 0:
+            venceu = 1
+            tela = 4
+            continue
         
         janela.blit(img_mapa, (0,0))
         toten.desenhaTotem(janela, (0, 200, 0))
         area1.drawArea(janela, (0, 100, 100))
         area2.drawArea(janela, (0, 100, 100))
+        jogador1.desenhar_jogador((0,0,0), janela)
         jogador1.atualizaPosicao(h, v)
-        jogador1.desenhar_jogador((255, 255, 255), janela)
-        
+        jogador1.desativaPassiva()
+
+        for inimigo in zumbis:
+            inimigo.andar(jogador1)
+            inimigo.corrigirPosicao()
+            inimigo.darDano(jogador1)
+            inimigo.desenhaInimigo(janela, (255, 0, 0))
+
+
+        if time.time() - jogador1.tempoDanoArea  < 5:
+            corDanoArea = (255, 0 , 0)
+        else:
+            corDanoArea = (0,255, 0)
+        if time.time() -jogador1.tempoTiro  < 2:
+            corTiro = (255, 0 , 0)
+        else:
+            corTiro = (0, 255, 0)
+        if time.time() -jogador1.tempoPassiva < 40:
+            corPassiva = (255, 0 ,0)
+        else:
+            corPassiva = (0, 255, 0)
+        pygame.draw.rect(janela, (0, 255, 0), g1)
+        text = fonte.render("1", True, (255,255,255))
+        janela.blit(text, (125, 31))
+        pygame.draw.rect(janela, corTiro, g2)
+        text = fonte.render("2", True, (255,255,255))
+        janela.blit(text, (185, 31))
+        pygame.draw.rect(janela, corDanoArea, g3)
+        text = fonte.render("3", True, (255,255,255))
+        janela.blit(text, (245, 31))
+        pygame.draw.rect(janela, corPassiva, g4)
+        text = fonte.render("4", True, (255,255,255))
+        janela.blit(text, (305, 31))
+        barra_de_vida = pygame.Rect(340, 680, 500* (jogador1.vida/jogador1.vidaTotal), 30)
+        text = fonte.render("Vida dO Totem:", True, (0,0,0))
+        janela.blit(text, (265, 680))
+        pygame.draw.rect(janela, (0, 255, 0), barra_de_vida)
+        barra_de_vida = pygame.Rect(1150, 30, 30, 300*(jogador1.vida/jogador1.vidaTotal))
+        text = fonte.render("Vida:", True, (0,0,0))
+        janela.blit(text, (1180, 0))
+        pygame.draw.rect(janela, (0, 255, 0), barra_de_vida)
+
         #tiros
         for shot in tiros:
             shot.atualiza()
             if shot.removeTiro():
                 tiros.pop(tiros.index(shot))
             shot.desenha((255,0,0), janela)
-
+            for inimigo in zumbis:
+                if shot.rect.colliderect(inimigo.rect):
+                    tiros.pop(tiros.index(shot))
+                    inimigo.vida -= jogador1.danoDist
+                if(inimigo.vida <= 0):
+                    zumbis.pop(zumbis.index(inimigo))
+                    continue
+            if shot.rect.colliderect(toten.rect):
+                toten.vida-= jogador1.danoDist
         #personagens
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -255,26 +324,16 @@ while executando:
                 #golpe
                 if event.key == pygame.K_1:
                     #personagem parado
-                    if v == 0 and h == 0:
-                        golpe = pygame.Rect(rect.x+(30*lasth/2), rect.y+(30*lastv/2), 30, 30)
-                    #personagem dando porrada andando
-                    else:
-                        golpe = pygame.Rect(rect.x+(30*h/2), rect.y+(30*v/2), 30, 30)
-                    pygame.draw.rect(janela, (0,0,255), golpe)
+                    jogador1.bater(janela, v, h, lasth, lastv, zumbis, toten)
                 #atirar
                 if event.key == pygame.K_2:
-                    if v == 0 and h == 0:
-                        tiros.append(tiro.Tiro(rect.x, rect.y, lastv/2, lasth/2))
-                    else:
-                        tiros.append(tiro.Tiro(rect.x, rect.y, v/2, h/2))
+                    jogador1.atirar(tiros, v, h, lastv, lasth)
                 #dano em área
                 if event.key == pygame.K_3:
-                    dano_em_area = pygame.Rect(rect.x-50, rect.y-50, 130, 130)
-                    pygame.draw.rect(janela, (255,0,0), dano_em_area)    
-                    pygame.draw.rect(janela, (0,0,0), rect)
+                    jogador1.danoArea(janela, zumbis, toten)
                 #passiva
                 if event.key == pygame.K_4:
-                    pedro = "sodras"
+                    jogador1.passiva()
                 #golpe pausado 
                 if event.key == pygame.K_SPACE:
                     while golpe_mouse == True:
@@ -288,43 +347,23 @@ while executando:
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT:
                     h = 0
-                    jogador1.ultimoMovimento(-1, 0)
+                    lasth = -1
+                    lastv = 0
                 if event.key == pygame.K_RIGHT:
                     h = 0
-                    jogador1.ultimoMovimento(1, 0)
+                    lasth = 1
+                    lastv = 0
                 if event.key == pygame.K_UP:
                     v = 0
-                    jogador1.ultimoMovimento(0, -1)
+                    lastv = -1
+                    lasth = 0
                 if event.key == pygame.K_DOWN:
                     v = 0
-                    jogador1.ultimoMovimento(0, 1)
+                    lastv = 1
+                    lasth = 0
         #recondicionar personagem
         #direita parte de baixo
-        if(rect.x + 30 >= 1151 and rect.y>= 265):
-            rect.x -= 2
-        #direita parte de cima
-        if (rect.x + 30 >= 1021 and rect.y < 265):
-            rect.x -=2
-        #esquerda parte de baixo
-        if rect.x <= 102 and rect.y >= 265:
-            rect.x += 2
-        #esquerda em cima
-        if rect.x <= 229 and rect.y < 265:
-            rect.x +=2
-        #em cima
-        if rect.y < 121 and rect.x > 229 and rect.x < 1021:
-            rect.y +=2
-        #cima baixo
-        if rect.y < 267 and (rect.x <= 229 or rect.x >= 1021):
-            rect.y +=2
-        #embaixo
-        if rect.y + 30 >= 600:
-            rect.y = 569
-        
-        
-        colisoes = pygame.sprite.spritecollide(jogador1, areas, False)
-        for _ in colisoes:
-            print("colidiu")
+        jogador1.corrigirPosicao()
 
 
     ######################################

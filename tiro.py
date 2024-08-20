@@ -11,8 +11,8 @@ class Tiro(pygame.sprite.Sprite):
     def desenha(self, color: tuple , tela):
         pygame.draw.rect(tela, color, self.rect)
     def atualiza(self):
-        self.x += 5*self.horizontal
-        self.y += 5*self.vertical
+        self.x += 10*self.horizontal
+        self.y += 10*self.vertical
         self.rect = pygame.Rect(self.x, self.y, 16, 16)
     def removeTiro(self):
         if self.x <= 0 or self.x >= 1280 or self.y <= 0 or self.y >= 720:
