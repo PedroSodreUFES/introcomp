@@ -21,7 +21,8 @@ tela = 1
 font = pygame.font.Font(None, 52)
 
 # SOM
-pygame.mixer_music.load("audios/Peaches.m4a")
+
+pygame.mixer_music.load("audios/sweetdreams.mp3")
 pygame.mixer_music.play(-1)
 confirmar = pygame.mixer.Sound("audios/confirm.wav")
 trocar = pygame.mixer.Sound("audios/mudar.wav")
@@ -108,10 +109,11 @@ while exec == True:
 
     #gameplay
     elif tela == 3:
-        tela = 4
-        #ajustes para a 4 tela
-        mudar_foto = time.time()
-        inicial = 0
+        #alguma condicao de acabar o jogo    
+            tela = 4
+            #ajustes para a 4 tela
+            mudar_foto = time.time()
+            inicial = 0
 
 
     #gameOver
