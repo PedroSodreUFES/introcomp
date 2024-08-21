@@ -116,16 +116,18 @@ while exec == True:
 
     #gameOver
     elif tela == 4:
+        tempo = time.time()
         img_fundo = pygame.image.load(imagens_fim_de_jogo[inicial])
         janela.blit(img_fundo, (0, 0))
         for evento in pygame.event.get():
             if evento.type == pygame.KEYDOWN:
                 if evento.key == pygame.K_q:
                     confirmar.play() #som de confirmar
-                    exec = False
+                    while time.time() - tempo < 0.5:
+                        exec = False
             if evento.type == pygame.QUIT:
                 exec = False
-        if time.time() - mudar_foto > 0.3:
+        if time.time() - mudar_foto > 0.6:
             mudar_foto = time.time()
             inicial += 1
             if inicial > 1:
