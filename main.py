@@ -39,6 +39,9 @@ personagens_escolhidos = 0
 aliados = []
 inimigos = []
 
+#imagens gameOver
+imagens_fim_de_jogo = ["assets/fimdejogo.png", "assets/fimdejogo1.png"]
+
 # loop do jogo
 exec = True
 while exec == True:
@@ -105,8 +108,28 @@ while exec == True:
 
     #gameplay
     elif tela == 3:
-        exec = False
+        tela = 4
+        #ajustes para a 4 tela
+        mudar_foto = time.time()
+        inicial = 0
 
+
+    #gameOver
+    elif tela == 4:
+        img_fundo = pygame.image.load(imagens_fim_de_jogo[inicial])
+        janela.blit(img_fundo, (0, 0))
+        for evento in pygame.event.get():
+            if evento.type == pygame.KEYDOWN:
+                if evento.key == pygame.K_q:
+                    confirmar.play() #som de confirmar
+                    exec = False
+            if evento.type == pygame.QUIT:
+                exec = False
+        if time.time() - mudar_foto > 0.3:
+            mudar_foto = time.time()
+            inicial += 1
+            if inicial > 1:
+                inicial = 0
 
     pygame.display.flip()
 
