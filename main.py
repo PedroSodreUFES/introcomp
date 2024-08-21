@@ -2,6 +2,8 @@ import pygame
 
 import time
 
+import random
+
 pygame.init()
 
 # settings janela 
@@ -89,7 +91,9 @@ while exec == True:
                     confirmar.play() # som de confirmar
                     escolher_personagem.pop(personagem)
                     personagens_escolhidos+=1
-                    personagem = 0
+                    #se a posicao do personagem escolhido era a ultima
+                    if personagem >= len(escolher_personagem):
+                        personagem = len(escolher_personagem) - 1
                     if personagens_escolhidos == 3:
                         tela = 3
                         mudar_foto = time.time()
