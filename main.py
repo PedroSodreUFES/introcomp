@@ -10,7 +10,7 @@ pygame.init()
 largura = 1280
 altura = 720
 janela = pygame.display.set_mode((largura, altura))
-pygame.display.set_caption('Raony, o Jogo!')
+pygame.display.set_caption('Raony Warfare')
 icon = pygame.image.load('assets/RAONY.png')    
 pygame.display.set_icon(icon)
 fps = 60
